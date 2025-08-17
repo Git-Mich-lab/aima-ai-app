@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// ----------------- Helper: Complexity Classification -----------------
+// ----------------- Helper: Complexity Classification -----------------------------
 async function classifyComplexity(question) {
     try {
         const response = await axios.post(
@@ -47,7 +47,7 @@ async function classifyComplexity(question) {
     }
 }
 
-// ----------------- Chat Route -----------------
+// ----------------- Chat Route --------------------------------------
 app.post('/chat', async (req, res) => {
     const { message } = req.body;
 
@@ -89,6 +89,40 @@ app.post('/chat', async (req, res) => {
         res.status(500).json({ error: 'AI request failed. See server logs.' });
     }
 });
+
+//-----------------Fun fact route ---------------------------------------
+
+// Random Fun Fact Endpoint
+app.post('/funfact', async (req, res) => {
+    try {
+        const prompt = "gimme a fact.";
+        const response = await axios.post(
+            'https://api.groq.com/openai/v1/chat/completions',
+            {
+                model: 'openai/gpt-oss-120b',
+                messages: [
+                    { role: 'system', content: 'You are a fun-fact generator.' },
+                    { role: 'user', content: prompt }
+                ],
+                temperature: 0.7
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        const fact = response.data.choices[0].message?.content || "Couldn't generate a fact.";
+        res.json({ fact });
+
+    } catch (err) {
+        console.error('Groq API Error:', err.response?.data || err.message);
+        res.status(500).json({ fact: "Error generating fact." });
+    }
+});
+
 
 // ----------------- Start Server -----------------
 app.listen(PORT, () => {
