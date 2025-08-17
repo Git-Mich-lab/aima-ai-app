@@ -5,17 +5,19 @@ const axios = require('axios');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 5000; // Render assigns PORT dynamically
 
-app.use(express.static(path.join(__dirname, 'frontend')));
 app.use(cors());
 app.use(express.json());
 
+// Serve static frontend
+app.use(express.static(path.join(__dirname, 'frontend')));
+
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+    res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// Helper function to classify complexity using the lightweight model
+// ----------------- Helper: Complexity Classification -----------------
 async function classifyComplexity(question) {
     try {
         const response = await axios.post(
@@ -37,9 +39,7 @@ async function classifyComplexity(question) {
         );
 
         const classification =
-            response.data.choices[0].message?.content?.trim().toLowerCase() ||
-            'simple';
-
+            response.data.choices[0].message?.content?.trim().toLowerCase() || 'simple';
         return classification.includes('complex') ? 'complex' : 'simple';
     } catch (err) {
         console.error('Classification Error:', err.response?.data || err.message);
@@ -47,6 +47,7 @@ async function classifyComplexity(question) {
     }
 }
 
+// ----------------- Chat Route -----------------
 app.post('/chat', async (req, res) => {
     const { message } = req.body;
 
@@ -55,20 +56,13 @@ app.post('/chat', async (req, res) => {
     }
 
     try {
-        // Determine complexity first
         const complexity = await classifyComplexity(message);
+        const model = complexity === 'complex' ? 'deepseek-r1-distill-llama-70b' : 'openai/gpt-oss-120b';
 
-        // Select appropriate model
-        const model =
-            complexity === 'complex'
-                ? 'deepseek-r1-distill-llama-70b'
-                : 'openai/gpt-oss-120b';
-
-        // Send the actual chat request to the chosen model
         const response = await axios.post(
             'https://api.groq.com/openai/v1/chat/completions',
             {
-                model: model,
+                model,
                 messages: [
                     { role: 'system', content: 'You are a sweet and kind loving assistant.' },
                     { role: 'user', content: message }
@@ -96,6 +90,7 @@ app.post('/chat', async (req, res) => {
     }
 });
 
+// ----------------- Start Server -----------------
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

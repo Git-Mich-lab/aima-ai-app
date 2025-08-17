@@ -32,15 +32,12 @@ function fadeOutWelcomeOnce() {
     if (firstMessageSent) return;
     firstMessageSent = true;
 
-    // Fade + collapse welcome
     welcomeScreen.classList.add('fade-out');
 
-    // After transition ends, fully hide it and reveal chat
     const onEnd = () => {
         welcomeScreen.classList.add('hidden');
         welcomeScreen.classList.remove('fade-out');
 
-        // Reveal chat container (make sure it's visible)
         chatContainer.classList.remove('hidden'); 
         chatContainer.classList.add('chat-reveal');
 
@@ -48,7 +45,6 @@ function fadeOutWelcomeOnce() {
     };
     welcomeScreen.addEventListener('transitionend', onEnd);
 
-    // Safety fallback
     setTimeout(onEnd, 800);
 }
 
@@ -56,13 +52,10 @@ async function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
 
-    // First message triggers fade-out of welcome
     fadeOutWelcomeOnce();
-
     appendMessage('user', message);
     userInput.value = '';
 
-    // Show AI thinking animation
     const thinkingDiv = document.createElement('div');
     thinkingDiv.classList.add('message', 'ai');
     thinkingDiv.id = 'thinking';
@@ -77,7 +70,8 @@ async function sendMessage() {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        const res = await fetch('http://localhost:3000/chat', {
+        // ✅ Updated to relative path so it works on Render
+        const res = await fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message })
@@ -128,32 +122,27 @@ async function appendAIMessage(message) {
 // ----------------- Settings Panel Toggle -----------------
 settingsBtn.addEventListener('click', () => {
     if (settingsPanel.classList.contains('open')) {
-        // Closing
         settingsPanel.classList.remove('open');
         settingsPanel.classList.add('closing');
         setTimeout(() => {
             settingsPanel.style.display = 'none';
             settingsPanel.classList.remove('closing');
-        }, 300); // match your CSS transition duration
+        }, 300);
     } else {
-        // Opening
         settingsPanel.style.display = 'flex';
         setTimeout(() => {
             settingsPanel.classList.add('open');
-        }, 10); // let browser apply display before transition
+        }, 10);
     }
 });
-
 
 // ----------------- Background & Settings Updates -----------------
 function updateBackground() {
     if (solidToggle && solidToggle.checked) {
-        // Solid background
         document.body.style.background = solidColorInput.value;
         document.body.classList.remove('gradient-animated');
     } else {
-        // Gradient background using CSS variables
-        document.body.style.background = ''; // let CSS handle it
+        document.body.style.background = '';
         if (gradient1Input && gradient2Input) {
             document.body.style.setProperty('--gradient1', gradient1Input.value);
             document.body.style.setProperty('--gradient2', gradient2Input.value);
@@ -167,7 +156,6 @@ function updateBackground() {
     }
 }
 
-// Live updates
 if (gradient1Input) gradient1Input.addEventListener('input', updateBackground);
 if (gradient2Input) gradient2Input.addEventListener('input', updateBackground);
 if (gradientToggle) gradientToggle.addEventListener('change', () => {
@@ -190,5 +178,4 @@ if (containerWidthInput) containerWidthInput.addEventListener('input', () => {
     document.querySelector('.container').style.maxWidth = value + 'px';
 });
 
-// Apply default background on load
 updateBackground();
