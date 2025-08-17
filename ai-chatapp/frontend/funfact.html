@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Fun Facts</title>
+    <link rel="stylesheet" href="./CSS/funfact.css">
+    <link rel="icon" href="./favicon.png" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <h1>💡 Random Fun Facts</h1>
+
+        <div id="factPanel">
+            <p id="factText">Click the button to generate a fact!</p>
+        </div>
+
+        <button id="generateBtn">Generate Fact</button>
+    </div>
+
+    <a href="./index.html"><button>Back to AIMA</button></a>
+    
+    <script>document.addEventListener('DOMContentLoaded', () => {
+    const factText = document.getElementById('factText');
+    const generateBtn = document.getElementById('generateBtn');
+
+    const generateFact = async () => {
+        generateBtn.disabled = true;
+        generateBtn.textContent = 'Generating...';
+
+        try {
+            const res = await fetch('http://localhost:5000/funfact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await res.json();
+
+            // Simple typing animation
+            factText.textContent = '';
+            const fact = data.fact || "Oops! Couldn't get a fact.";
+            for (let i = 0; i < fact.length; i++) {
+                await new Promise(r => setTimeout(r, 25));
+                factText.textContent += fact[i];
+            }
+
+        } catch (err) {
+            factText.textContent = "Error generating fact. Check server.";
+            console.error(err);
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Generate Fact';
+        }
+    };
+
+    generateBtn.addEventListener('click', generateFact);
+});
+</script>
+</body>
+</html>

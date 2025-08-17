@@ -1,0 +1,379 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+/* Background */
+body {
+    --gradient1: #000000;
+    --gradient2: #ffffff;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(-45deg, var(--gradient1), var(--gradient2), var(--gradient1), var(--gradient2));
+    background-size: 400% 400%;
+    transition: background 0.5s ease;
+}
+
+/* Gradient animation active only when this class is added */
+body.gradient-animated {
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Container */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    max-width: 500px;
+    padding: 10px;
+    transition: max-width 0.3s ease;
+}
+
+/* Welcome Screen */
+.centered {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    color: #fdfdfd;
+    text-align: center;
+
+    /* smoother fade + collapse */
+    max-height: 100vh;
+    overflow: hidden;
+    transition: opacity 0.6s ease, max-height 0.6s ease;
+}
+
+.centered.fade-out {
+    opacity: 0;
+    max-height: 0;
+    pointer-events: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* AIMA Logo */
+.AIMA {
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+.AIMA {
+      color: #ffffff;
+      position: relative;
+      font-size: 2.5rem;
+      font-weight: bold;
+      overflow: hidden; 
+      border-radius: 1.5rem;
+      padding: 1rem 2rem;
+    }
+
+.AIMA::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      z-index: -1;
+      background: conic-gradient(
+        from 0deg,
+        #f59e0b, /* amber */
+        #ef4444, /* red */
+        #8b5cf6, /* violet */
+        #3b82f6, /* blue */
+        #10b981, /* emerald */
+        #f59e0b /* amber */
+      );
+      filter: blur(10px);
+      border-radius: 2rem;
+      opacity: 0;
+      animation: gemini-border-glow 4s ease-in-out forwards;
+    }
+
+@keyframes gemini-border-glow {
+      0% {
+        transform: scale(0.8) rotate(0deg);
+        opacity: 0;
+      }
+      20% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      80% {
+        transform: scale(1) rotate(360deg);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.8) rotate(360deg);
+        opacity: 0;
+      }
+}
+
+/* Chat container */
+#chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+
+    /* hidden until reveal */
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* ✅ Added smoother reveal for chat */
+#chat-container.chat-reveal {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* ✅ Added "chat-visible" to force visibility after welcome fades */
+#chat-container.chat-visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+}
+
+#chat-box {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1); /* Lighter, more transparent background */
+  backdrop-filter: blur(15px) saturate(180%); /* Increased blur and saturation for a more vibrant effect */
+  border-radius: 20px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2); /* A thin, light border for a defined edge */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0); /* A soft, diffused shadow for depth */
+  position: relative; /* Needed for the pseudo-element */
+}
+
+#chat-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  pointer-events: none; /* Prevents the overlay from blocking interactions */
+  transition: all 0.3s ease;
+}
+
+/* Messages */
+.message {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: messageFadeIn 0.4s forwards;
+}
+
+@keyframes messageFadeIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.user {
+    background: rgba(79,195,247,0.3);
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+}
+
+.ai {
+    background: rgba(129,199,132,0.3);
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+}
+
+/* Input */
+.input-container {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+#user-input {
+    flex: 1;
+    padding: 1rem 1.25rem;
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(25px) saturate(1.8);
+    font-size: 1rem;
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1),
+                0 1px 3px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+}
+
+#user-input:hover,
+#user-input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15),
+                0 2px 4px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+
+#send-btn {
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: none;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    font-weight: bold;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+/* Added hover effect */
+#send-btn:hover {
+    background: rgba(255,255,255,0.25);
+    transform: scale(1.05);
+}
+
+/* Thinking indicator */
+.thinking {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.thinking-dot {
+    width: 10px;
+    height: 10px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+    0%, 80%, 100% { opacity: 0; }
+    40% { opacity: 1; }
+}
+
+/* Settings button */
+/*-------------------------*/
+#settings-panel {
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#settings-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#settings-panel.closing {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+#settings-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+/* Added hover effect */
+#settings-btn:hover {
+    background: rgba(255,255,255,0.35);
+    transform: scale(1.05);
+}
+
+/* Floating Settings panel */
+#settings-panel {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    width: 260px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(20px);
+    border-radius: 15px;
+    padding: 15px;
+    display: none;  /* hidden by default */
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Active state for panel */
+#settings-panel.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#settings-panel h3 {
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+#settings-panel label {
+    font-size: 0.9rem;
+    color: #fff;
+}
+
+#settings-panel input[type="color"],
+#settings-panel input[type="range"],
+#settings-panel select {
+    width: 100%;
+}
