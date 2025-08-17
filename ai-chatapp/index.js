@@ -16,6 +16,10 @@ app.get('/', (req, res) =>
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'))
 );
 
+app.get('/funfact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'funfact.html'));
+});
+
 
 // ----------------- Helper: Complexity Classification -----------------------------
 async function classifyComplexity(question) {
