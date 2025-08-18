@@ -1,54 +1,30 @@
 require('dotenv').config();
-const path = require('path');
 const express = require('express');
-const axios = require('axios');
 const cors = require('cors');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const path = require('path');
 
 const app = express();
-
-// Render provides PORT dynamically
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-// ----------------- Serve Frontend -----------------
+// Serve frontend files
 app.use(express.static(path.join(__dirname, 'frontend')));
 
-// Root route → serve your main chat app
+// Default route → index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// ----------------- Helper: Complexity Classification -----------------
-async function classifyComplexity(question) {
-  try {
-    const response = await axios.post(
-      'https://api.groq.com/openai/v1/chat/completions',
-      {
-        model: 'openai/gpt-oss-120b',
-        messages: [
-          { role: 'system', content: 'You are a classifier. Answer with "simple" or "complex" based on the user question.' },
-          { role: 'user', content: question }
-        ],
-        temperature: 0
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const classification =
-      response.data.choices[0].message?.content?.trim().toLowerCase() || 'simple';
-    return classification.includes('complex') ? 'complex' : 'simple';
-  } catch (err) {
-    console.error('Classification Error:', err.response?.data || err.message);
-    return 'simple'; // fallback
-  }
+// Gemini setup
+if (!process.env.GEMINI_API_KEY) {
+  console.error("❌ Missing GEMINI_API_KEY in .env file!");
+  process.exit(1);
 }
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // ----------------- Chat Route -----------------
 app.post('/chat', async (req, res) => {
@@ -59,47 +35,27 @@ app.post('/chat', async (req, res) => {
   }
 
   try {
-    // Determine complexity
-    const complexity = await classifyComplexity(message);
+    const result = await model.generateContent(message);
 
-    // Pick model
-    const model =
-      complexity === 'complex'
-        ? 'deepseek-r1-distill-llama-70b'
-        : 'openai/gpt-oss-120b';
+    // Extract the response text
+    const reply =
+      result?.response?.text() ||
+      "Sorry, I couldn't generate a response.";
 
-    // Call Groq API
-    const response = await axios.post(
-      'https://api.groq.com/openai/v1/chat/completions',
-      {
-        model,
-        messages: [
-          { role: 'system', content: 'You are a sweet and kind loving assistant.' },
-          { role: 'user', content: message }
-        ],
-        temperature: 0.7
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const aiMessage =
-      response.data.choices[0].message?.content ||
-      response.data.choices[0].text ||
-      'Sorry, I could not generate a response.';
-
-    res.json({ reply: aiMessage });
+    res.json({ reply });
   } catch (err) {
-    console.error('Groq API Error:', err.response?.data || err.message);
+    console.error("❌ Gemini API Error Details:");
+    if (err.response) {
+      console.error("Status:", err.response.status);
+      console.error("Data:", err.response.data);
+    } else {
+      console.error(err.stack || err.message || err);
+    }
     res.status(500).json({ error: 'AI request failed. See server logs.' });
   }
 });
 
 // ----------------- Start Server -----------------
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

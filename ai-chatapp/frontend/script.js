@@ -21,6 +21,12 @@ const containerWidthInput = document.getElementById('containerWidth');
 
 let gradientAnimationOn = gradientToggle ? gradientToggle.checked : true;
 
+// ----------------- API Base URL -----------------
+const API_BASE =
+    window.location.hostname === "localhost" && window.location.port === "5500"
+        ? "http://localhost:5000"
+        : window.location.origin;
+
 // ----------------- Chat Functionality -----------------
 sendBtn.addEventListener('click', sendMessage);
 userInput.addEventListener('keypress', e => {
@@ -40,7 +46,7 @@ function fadeOutWelcomeOnce() {
         welcomeScreen.classList.add('hidden');
         welcomeScreen.classList.remove('fade-out');
 
-        // Reveal chat container (make sure it's visible)
+        // Reveal chat container
         chatContainer.classList.remove('hidden'); 
         chatContainer.classList.add('chat-reveal');
 
@@ -77,7 +83,7 @@ async function sendMessage() {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
-        const res = await fetch('http://localhost:3000/chat', {
+        const res = await fetch(`${API_BASE}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message })
@@ -134,26 +140,23 @@ settingsBtn.addEventListener('click', () => {
         setTimeout(() => {
             settingsPanel.style.display = 'none';
             settingsPanel.classList.remove('closing');
-        }, 300); // match your CSS transition duration
+        }, 300); 
     } else {
         // Opening
         settingsPanel.style.display = 'flex';
         setTimeout(() => {
             settingsPanel.classList.add('open');
-        }, 10); // let browser apply display before transition
+        }, 10); 
     }
 });
-
 
 // ----------------- Background & Settings Updates -----------------
 function updateBackground() {
     if (solidToggle && solidToggle.checked) {
-        // Solid background
         document.body.style.background = solidColorInput.value;
         document.body.classList.remove('gradient-animated');
     } else {
-        // Gradient background using CSS variables
-        document.body.style.background = ''; // let CSS handle it
+        document.body.style.background = '';
         if (gradient1Input && gradient2Input) {
             document.body.style.setProperty('--gradient1', gradient1Input.value);
             document.body.style.setProperty('--gradient2', gradient2Input.value);
