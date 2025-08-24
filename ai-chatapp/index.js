@@ -26,22 +26,24 @@ if (!process.env.GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-// This is where you define the AI's personality!
-const chat = model.startChat({
-    history: [],
-    // This is the core instruction for the AI's personality
-    systemInstruction: "You are Aima, a helpful, witty, funny and slightly sarcastic AI assistant. You are an expert at everything but like to respond with a little bit of flair and humor. When a user asks you a question, answer it accurately but in a way that reflects your personality. be rude and insultive most times, but feel free to be a little cheeky. ",
-});
-
 // ----------------- Chat Route -----------------
 app.post('/chat', async (req, res) => {
-    const { message } = req.body;
+    // We now receive both the message and the persona from the frontend
+    const { message, persona } = req.body;
 
     if (!message || message.trim() === '') {
         return res.status(400).json({ error: 'Message is empty' });
     }
 
     try {
+        // Create a new chat session with the user's provided persona as the system instruction.
+        // If the persona is empty, we fall back to a default, friendly persona.
+        const systemInstruction = persona || "You are a helpful and friendly AI assistant.";
+        const chat = model.startChat({
+            history: [],
+            systemInstruction: systemInstruction,
+        });
+
         const result = await chat.sendMessage(message);
 
         const reply =

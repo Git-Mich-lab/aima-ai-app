@@ -18,6 +18,7 @@ const solidColorInput = document.getElementById('solidColor');
 const fontSizeInput = document.getElementById('fontSize');
 const textColorInput = document.getElementById('textColor');
 const containerWidthInput = document.getElementById('containerWidth');
+const aiPersonaInput = document.getElementById('ai-persona-input'); // New: Persona input element
 
 let gradientAnimationOn = gradientToggle ? gradientToggle.checked : true;
 
@@ -47,7 +48,7 @@ function fadeOutWelcomeOnce() {
         welcomeScreen.classList.remove('fade-out');
 
         // Reveal chat container
-        chatContainer.classList.remove('hidden'); 
+        chatContainer.classList.remove('hidden');
         chatContainer.classList.add('chat-reveal');
 
         welcomeScreen.removeEventListener('transitionend', onEnd);
@@ -68,6 +69,9 @@ async function sendMessage() {
     appendMessage('user', message);
     userInput.value = '';
 
+    // Get the current persona from the input field
+    const persona = aiPersonaInput.value.trim();
+
     // Show AI thinking animation
     const thinkingDiv = document.createElement('div');
     thinkingDiv.classList.add('message', 'ai');
@@ -86,7 +90,8 @@ async function sendMessage() {
         const res = await fetch(`${API_BASE}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message })
+            // Pass both the message and the persona to the backend
+            body: JSON.stringify({ message, persona })
         });
 
         const data = await res.json();
@@ -140,13 +145,13 @@ settingsBtn.addEventListener('click', () => {
         setTimeout(() => {
             settingsPanel.style.display = 'none';
             settingsPanel.classList.remove('closing');
-        }, 300); 
+        }, 300);
     } else {
         // Opening
         settingsPanel.style.display = 'flex';
         setTimeout(() => {
             settingsPanel.classList.add('open');
-        }, 10); 
+        }, 10);
     }
 });
 
