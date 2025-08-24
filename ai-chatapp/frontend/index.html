@@ -1,58 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIMA-an ai app</title>
-    <link rel="stylesheet" href="./CSS/style.css">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIMA-an ai app</title>
+  <link rel="stylesheet" href="./CSS/style.css">
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <button id="settings-btn">⚙️ Settings</button>
+  <!-- Settings button -->
+  <button id="settings-btn">⚙️ Settings</button>
 
-    <div id="settings-panel">
-        <h3>Settings</h3>
-        <label>Gradient Color 1:</label>
-        <input type="color" id="gradient1" value="#000000">
+  <!-- Floating Settings panel -->
+  <div id="settings-panel">
+    <h3>Settings</h3>
+    <label>Gradient Color 1:</label>
+    <input type="color" id="gradient1" value="#000000">
 
-        <label>Gradient Color 2:</label>
-        <input type="color" id="gradient2" value="#ffffff">
+    <label>Gradient Color 2:</label>
+    <input type="color" id="gradient2" value="#ffffff">
 
-        <label><input type="checkbox" id="gradientToggle" checked> Gradient Animation</label>
+    <label><input type="checkbox" id="gradientToggle" checked> Gradient Animation</label>
 
-        <label><input type="checkbox" id="solidToggle"> Solid Background</label>
-        <input type="color" id="solidColor" value="#333333">
+    <label><input type="checkbox" id="solidToggle"> Solid Background</label>
+    <input type="color" id="solidColor" value="#333333">
 
-        <label>Font Size:</label>
-        <input type="range" id="fontSize" min="12" max="24" value="16">
+    <label>Font Size:</label>
+    <input type="range" id="fontSize" min="12" max="24" value="16">
 
-        <label>Text Color:</label>
-        <input type="color" id="textColor" value="#ffffff">
+    <label>Text Color:</label>
+    <input type="color" id="textColor" value="#ffffff">
 
-        <label>Container Width:</label>
-        <input type="range" id="containerWidth" min="0" max="100" value="38">
-        
-        <hr>
-        <label>AI Persona:</label>
-        <textarea id="ai-persona-input" rows="4" placeholder="e.g., You are a witty and slightly sarcastic AI named Clyde."></textarea>
+    <label>Container Width:</label>
+    <input type="range" id="containerWidth" min="0" max="100" value="38">
+  </div>
+
+  <div class="container">
+    <!-- Welcome Screen -->
+    <div id="welcome-screen" class="centered">
+      <h1 class="AIMA">Chat with AIMA</h1>
+      <p>start a <strong>convo</strong> with AIMA — an AI app powered by Gemini</p>
     </div>
 
-    <div class="container">
-        <div id="welcome-screen" class="centered">
-            <h1 class="AIMA">Chat with AIMA</h1>
-            <p>start a <strong>convo</strong> with AIMA — an AI app powered by Gemini</p>
-        </div>
-
-        <div id="chat-container" class="hidden">
-            <div id="chat-box"></div>
-        </div>
-
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="Type your message...">
-            <button id="send-btn">Send</button>
-        </div>
+    <!-- Chat container -->
+    <div id="chat-container" class="hidden">
+      <div id="chat-box"></div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Single input container always at bottom -->
+    <div class="input-container">
+      <input type="text" id="user-input" placeholder="Type your message...">
+      <button id="send-btn">Send</button>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
