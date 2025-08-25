@@ -26,6 +26,9 @@ if (!process.env.GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
+// ----------------- Conversation Memory -----------------
+let chatHistory = []; // Stores past conversation messages
+
 // ----------------- Chat Route -----------------
 app.post('/chat', async (req, res) => {
   const { message } = req.body;
@@ -35,12 +38,18 @@ app.post('/chat', async (req, res) => {
   }
 
   try {
-    const result = await model.generateContent(message);
+    // Add user message to history
+    chatHistory.push({ role: "user", parts: [{ text: message }] });
 
-    // Extract the response text
-    const reply =
-      result?.response?.text() ||
-      "Sorry, I couldn't generate a response.";
+    // Generate response with memory (include history)
+    const result = await model.generateContent({
+      contents: chatHistory
+    });
+
+    const reply = result?.response?.text() || "Sorry, I couldn't generate a response.";
+
+    // Add AI response to history
+    chatHistory.push({ role: "model", parts: [{ text: reply }] });
 
     res.json({ reply });
   } catch (err) {
@@ -53,6 +62,12 @@ app.post('/chat', async (req, res) => {
     }
     res.status(500).json({ error: 'AI request failed. See server logs.' });
   }
+});
+
+// ----------------- Reset Conversation -----------------
+app.post('/reset', (req, res) => {
+  chatHistory = [];
+  res.json({ message: "Conversation reset ✅" });
 });
 
 // ----------------- Start Server -----------------

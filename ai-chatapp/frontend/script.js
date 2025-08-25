@@ -19,6 +19,9 @@ const fontSizeInput = document.getElementById('fontSize');
 const textColorInput = document.getElementById('textColor');
 const containerWidthInput = document.getElementById('containerWidth');
 
+// 🔹 NEW Reset button element
+const resetChatBtn = document.getElementById('reset-chat');
+
 let gradientAnimationOn = gradientToggle ? gradientToggle.checked : true;
 
 // ----------------- API Base URL -----------------
@@ -38,23 +41,17 @@ function fadeOutWelcomeOnce() {
     if (firstMessageSent) return;
     firstMessageSent = true;
 
-    // Fade + collapse welcome
     welcomeScreen.classList.add('fade-out');
 
-    // After transition ends, fully hide it and reveal chat
     const onEnd = () => {
         welcomeScreen.classList.add('hidden');
         welcomeScreen.classList.remove('fade-out');
-
-        // Reveal chat container
         chatContainer.classList.remove('hidden'); 
         chatContainer.classList.add('chat-reveal');
-
         welcomeScreen.removeEventListener('transitionend', onEnd);
     };
     welcomeScreen.addEventListener('transitionend', onEnd);
 
-    // Safety fallback
     setTimeout(onEnd, 800);
 }
 
@@ -62,13 +59,10 @@ async function sendMessage() {
     const message = userInput.value.trim();
     if (!message) return;
 
-    // First message triggers fade-out of welcome
     fadeOutWelcomeOnce();
-
     appendMessage('user', message);
     userInput.value = '';
 
-    // Show AI thinking animation
     const thinkingDiv = document.createElement('div');
     thinkingDiv.classList.add('message', 'ai');
     thinkingDiv.id = 'thinking';
@@ -98,6 +92,21 @@ async function sendMessage() {
     }
 }
 
+// ----------------- NEW Reset Chat -----------------
+if (resetChatBtn) {
+    resetChatBtn.addEventListener('click', async () => {
+        try {
+            await fetch(`${API_BASE}/reset`, { method: 'POST' });
+            chatBox.innerHTML = ""; // clear messages visually
+            firstMessageSent = false;
+            welcomeScreen.classList.remove('hidden'); // show welcome screen again
+            appendMessage('ai', "🧹 Conversation reset.");
+        } catch (err) {
+            appendMessage('ai', "⚠️ Failed to reset conversation.");
+        }
+    });
+}
+
 // Append messages
 function appendMessage(sender, message) {
     const msgDiv = document.createElement('div');
@@ -107,7 +116,7 @@ function appendMessage(sender, message) {
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
 
-// AI message fade-in (4 lines at a time)
+// AI message fade-in
 async function appendAIMessage(message) {
     const aiDiv = document.createElement('div');
     aiDiv.classList.add('message', 'ai');
@@ -120,7 +129,6 @@ async function appendAIMessage(message) {
     for (let i = 0; i < lines.length; i++) {
         chunk += lines[i] + '\n';
         lineCount++;
-
         if (lineCount === 4 || i === lines.length - 1) {
             await new Promise(resolve => setTimeout(resolve, 250));
             aiDiv.textContent += chunk;
@@ -134,7 +142,6 @@ async function appendAIMessage(message) {
 // ----------------- Settings Panel Toggle -----------------
 settingsBtn.addEventListener('click', () => {
     if (settingsPanel.classList.contains('open')) {
-        // Closing
         settingsPanel.classList.remove('open');
         settingsPanel.classList.add('closing');
         setTimeout(() => {
@@ -142,7 +149,6 @@ settingsBtn.addEventListener('click', () => {
             settingsPanel.classList.remove('closing');
         }, 300); 
     } else {
-        // Opening
         settingsPanel.style.display = 'flex';
         setTimeout(() => {
             settingsPanel.classList.add('open');
@@ -161,7 +167,6 @@ function updateBackground() {
             document.body.style.setProperty('--gradient1', gradient1Input.value);
             document.body.style.setProperty('--gradient2', gradient2Input.value);
         }
-
         if (gradientAnimationOn) {
             document.body.classList.add('gradient-animated');
         } else {
