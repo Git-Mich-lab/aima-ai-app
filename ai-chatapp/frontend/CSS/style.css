@@ -210,16 +210,27 @@ body.gradient-animated {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.user {
-    background: rgba(79,195,247,0.3);
+.message.user {
     align-self: flex-end;
-    border-bottom-right-radius: 0;
+    background: #ffffff;
+    color: #000000;
+    padding: 12px 18px;
+    border-radius: 18px 18px 4px 18px; /* Gemini-like rounded shape */
+    max-width: 80%;
+    font-size: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.ai {
-    background: rgba(129,199,132,0.3);
+/* AI bubble (black Gemini style) */
+.message.ai {
     align-self: flex-start;
-    border-bottom-left-radius: 0;
+    background: #000000;
+    color: #ffffff;
+    padding: 12px 18px;
+    border-radius: 18px 18px 18px 4px;
+    max-width: 80%;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
 /* Input */

@@ -188,9 +188,7 @@ if (solidColorInput) solidColorInput.addEventListener('input', updateBackground)
 if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
     chatBox.style.fontSize = fontSizeInput.value + 'px';
 });
-if (textColorInput) textColorInput.addEventListener('input', () => {
-    chatBox.style.color = textColorInput.value;
-});
+
 if (containerWidthInput) containerWidthInput.addEventListener('input', () => {
     const minWidth = 400;
     const maxWidth = 1300;
