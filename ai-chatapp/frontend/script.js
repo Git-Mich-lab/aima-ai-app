@@ -116,28 +116,30 @@ function appendMessage(sender, message) {
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
 
-// AI message fade-down with Markdown rendering
+
+// AI message fade-in downward (Gemini-style) with Markdown rendering
 async function appendAIMessage(message) {
     const aiDiv = document.createElement('div');
     aiDiv.classList.add('message', 'ai');
     chatBox.appendChild(aiDiv);
 
-    // Convert Markdown → HTML
+    // Render Markdown for nice structure
     aiDiv.innerHTML = marked.parse(message);
 
-    // Fade-in effect
+    // Start hidden slightly above
     aiDiv.style.opacity = 0;
-    aiDiv.style.transform = "translateY(10px)";
-    aiDiv.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+    aiDiv.style.transform = "translateY(-20px)";
+    aiDiv.style.transition = "opacity 0.6s ease, transform 0.6s ease";
 
+    // Trigger transition on next frame
     requestAnimationFrame(() => {
         aiDiv.style.opacity = 1;
         aiDiv.style.transform = "translateY(0)";
     });
 
+    // Smooth scroll to bottom
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
-
 
 
 // ----------------- Settings Panel Toggle -----------------
