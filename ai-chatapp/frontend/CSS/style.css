@@ -233,6 +233,26 @@ body.gradient-animated {
     box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
+.ai h1, .ai h2, .ai h3 {
+    margin: 8px 0;
+    font-weight: bold;
+    color: #fff;
+}
+
+.ai ul {
+    padding-left: 20px;
+    margin: 6px 0;
+}
+
+.ai li {
+    margin: 4px 0;
+}
+
+.ai strong {
+    color: #ffeb3b; /* highlight bold text */
+}
+
+
 /* Input */
 .input-container {
     display: flex;

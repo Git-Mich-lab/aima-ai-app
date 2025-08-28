@@ -116,28 +116,29 @@ function appendMessage(sender, message) {
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
 
-// AI message fade-in
+// AI message fade-down with Markdown rendering
 async function appendAIMessage(message) {
     const aiDiv = document.createElement('div');
     aiDiv.classList.add('message', 'ai');
     chatBox.appendChild(aiDiv);
 
-    const lines = message.split('\n');
-    let chunk = '';
-    let lineCount = 0;
+    // Convert Markdown → HTML
+    aiDiv.innerHTML = marked.parse(message);
 
-    for (let i = 0; i < lines.length; i++) {
-        chunk += lines[i] + '\n';
-        lineCount++;
-        if (lineCount === 4 || i === lines.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 250));
-            aiDiv.textContent += chunk;
-            chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
-            chunk = '';
-            lineCount = 0;
-        }
-    }
+    // Fade-in effect
+    aiDiv.style.opacity = 0;
+    aiDiv.style.transform = "translateY(10px)";
+    aiDiv.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+
+    requestAnimationFrame(() => {
+        aiDiv.style.opacity = 1;
+        aiDiv.style.transform = "translateY(0)";
+    });
+
+    chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
+
+
 
 // ----------------- Settings Panel Toggle -----------------
 settingsBtn.addEventListener('click', () => {
@@ -186,8 +187,12 @@ if (solidToggle) solidToggle.addEventListener('change', updateBackground);
 if (solidColorInput) solidColorInput.addEventListener('input', updateBackground);
 
 if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
-    chatBox.style.fontSize = fontSizeInput.value + 'px';
+    const size = fontSizeInput.value + 'px';
+    document.querySelectorAll('.message').forEach(msg => {
+        msg.style.fontSize = size;
+    });
 });
+
 
 if (containerWidthInput) containerWidthInput.addEventListener('input', () => {
     const minWidth = 400;
@@ -198,3 +203,4 @@ if (containerWidthInput) containerWidthInput.addEventListener('input', () => {
 
 // Apply default background on load
 updateBackground();
+
