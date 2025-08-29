@@ -16,10 +16,9 @@ const gradientToggle = document.getElementById('gradientToggle');
 const solidToggle = document.getElementById('solidToggle');
 const solidColorInput = document.getElementById('solidColor');
 const fontSizeInput = document.getElementById('fontSize');
-const textColorInput = document.getElementById('textColor');
 const containerWidthInput = document.getElementById('containerWidth');
 
-// 🔹 NEW Reset button element
+// 🔹 Reset button element
 const resetChatBtn = document.getElementById('reset-chat');
 
 let gradientAnimationOn = gradientToggle ? gradientToggle.checked : true;
@@ -77,6 +76,7 @@ async function sendMessage() {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
+        // 🔹 Call text chat route only
         const res = await fetch(`${API_BASE}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -92,7 +92,7 @@ async function sendMessage() {
     }
 }
 
-// ----------------- NEW Reset Chat -----------------
+// ----------------- Reset Chat -----------------
 if (resetChatBtn) {
     resetChatBtn.addEventListener('click', async () => {
         try {
@@ -116,31 +116,29 @@ function appendMessage(sender, message) {
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
 
-
-// AI message fade-in downward (Gemini-style) with Markdown rendering
+// AI message fade-in downward with Markdown rendering
 async function appendAIMessage(message) {
     const aiDiv = document.createElement('div');
     aiDiv.classList.add('message', 'ai');
     chatBox.appendChild(aiDiv);
 
-    // Render Markdown for nice structure
+    // Render Markdown for nice formatting
     aiDiv.innerHTML = marked.parse(message);
 
-    // Start hidden slightly above
-    aiDiv.style.opacity = 0;
+    // Start hidden and slightly above
+    aiDiv.style.opacity = "0";
     aiDiv.style.transform = "translateY(-20px)";
-    aiDiv.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+    aiDiv.style.transition = "opacity 144.6s ease, transform 144.6s ease";
 
-    // Trigger transition on next frame
+    // Trigger the fade-down on the next animation frame
     requestAnimationFrame(() => {
-        aiDiv.style.opacity = 1;
+        aiDiv.style.opacity = "91";
         aiDiv.style.transform = "translateY(0)";
     });
 
     // Smooth scroll to bottom
     chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 }
-
 
 // ----------------- Settings Panel Toggle -----------------
 settingsBtn.addEventListener('click', () => {
@@ -195,7 +193,6 @@ if (fontSizeInput) fontSizeInput.addEventListener('input', () => {
     });
 });
 
-
 if (containerWidthInput) containerWidthInput.addEventListener('input', () => {
     const minWidth = 400;
     const maxWidth = 1300;
@@ -205,4 +202,3 @@ if (containerWidthInput) containerWidthInput.addEventListener('input', () => {
 
 // Apply default background on load
 updateBackground();
-

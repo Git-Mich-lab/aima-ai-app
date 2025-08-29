@@ -18,13 +18,15 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// Gemini setup
+// ----------------- Gemini Setup -----------------
 if (!process.env.GEMINI_API_KEY) {
   console.error("❌ Missing GEMINI_API_KEY in .env file!");
   process.exit(1);
 }
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+// Text/chat model only
+const textModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 // ----------------- Conversation Memory -----------------
 let chatHistory = []; // Stores past conversation messages
@@ -42,7 +44,7 @@ app.post('/chat', async (req, res) => {
     chatHistory.push({ role: "user", parts: [{ text: message }] });
 
     // Generate response with memory (include history)
-    const result = await model.generateContent({
+    const result = await textModel.generateContent({
       contents: chatHistory
     });
 
